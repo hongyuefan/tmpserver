@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hongyuefan/tmpserver/models"
+	"github.com/hongyuefan/tmpserver/types"
 	"github.com/hongyuefan/tmpserver/util/log"
 )
 
@@ -17,6 +19,43 @@ func NewHandlers() *Handlers {
 
 func (h *Handlers) OnClose() {
 
+}
+
+func (h *Handlers) HandlerAddMoney(c *gin.Context) {
+	var (
+		err    error
+		reqAdd types.ReqAddMoney
+		member models.Member
+		record models.AddMoneyRecord
+	)
+
+	if err = c.BindJSON(&reqAdd); err != nil {
+		goto errDeal
+	}
+
+	member.UserName = reqAdd.UserName
+	member.UID = reqAdd.UserId
+
+	if err = models.GetMember(&member, "uid", "username"); err != nil {
+		goto errDeal
+	}
+
+	record.Address = reqAdd.Address
+	record.Hash = reqAdd.Hash
+	record.Money = reqAdd.Amount
+	record.Status = types.STATUS_WAITING
+	record.Type = reqAdd.Type
+	record.UID = member.UID
+	record.Time = reqAdd.Time
+
+	if _, err = models.AddRecord(&record); err != nil {
+		goto errDeal
+	}
+	HandleSuccessMsg(c, "HandlerAddMoney", "success")
+	return
+errDeal:
+	HandleErrorMsg(c, "HandlerAddMoney", err.Error())
+	return
 }
 
 func (h *Handlers) HandlerPost(c *gin.Context) {
@@ -43,6 +82,12 @@ func (h *Handlers) HandlerGet(c *gin.Context) {
 errDeal:
 	HandleErrorMsg(c, "HandlerGet", err.Error())
 	return
+}
+
+func HandleSuccessMsg(c *gin.Context, requestType, msg string) {
+	responseWrite(c, true, msg)
+	logMsg := fmt.Sprintf("type[%s] From [%s] Params [%s]", requestType, c.Request.RemoteAddr, msg)
+	log.GetLog().LogInfo(logMsg)
 }
 
 func HandleDebugMsg(c *gin.Context, requestType string, info string) {

@@ -1,6 +1,7 @@
 {
 	"port":"8000",
 	"prof":"10006",
-	"logdir":"D:/Logs",
+	"logdir":"./",
+	"sqlconn":"root:30bb9f7ed8@tcp(39.105.5.188:3306)/cyyungoucms",
 	"idls":10
 }

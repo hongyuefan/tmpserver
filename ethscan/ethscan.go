@@ -28,13 +28,14 @@ type Transaction struct {
 	Value       string `json:"value"`
 	IsError     string `json:"isError"`
 	ErrCode     string `json:"errCode"`
+	Hash        string `json:"hash"`
 }
 
 func GetLastBlock() (int64, error) {
 
 	var rspBlockNumber RspBlockNumber
 
-	rsp, err := tools.Get("https://api.etherscan.io/api?module=proxy&action=eth_blockNumber")
+	rsp, err := tools.Get("https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=FIE4TCCJBDQ48VMA99H8F5X7FVQJ98JISA")
 	if err != nil {
 		return 0, err
 	}
@@ -54,7 +55,7 @@ func GetTxByHash(hash string) (*RspBlockTxs, error) {
 
 	var rspBlockTxs RspBlockTxs
 
-	url := "https://api.etherscan.io/api?module=account&action=txlistinternal&txhash=" + hash
+	url := "https://api.etherscan.io/api?module=account&action=txlistinternal&txhash=" + hash + "&apikey=FIE4TCCJBDQ48VMA99H8F5X7FVQJ98JISA"
 
 	rsp, err := tools.Get(url)
 	if err != nil {
@@ -76,7 +77,7 @@ func GetTx(start, end int64, address string) (*RspBlockTxs, error) {
 
 	var rspBlockTxs RspBlockTxs
 
-	url := "http://api.etherscan.io/api?module=account&action=txlist&address=" + address + "&startblock=" + fmt.Sprintf("%v", start) + "&endblock=" + fmt.Sprintf("%v", end) + "&sort=desc"
+	url := "http://api.etherscan.io/api?module=account&action=txlist&address=" + address + "&startblock=" + fmt.Sprintf("%v", start) + "&endblock=" + fmt.Sprintf("%v", end) + "&sort=desc" + "&apikey=FIE4TCCJBDQ48VMA99H8F5X7FVQJ98JISA"
 
 	rsp, err := tools.Get(url)
 	if err != nil {

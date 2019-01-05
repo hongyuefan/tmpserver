@@ -10,14 +10,15 @@ import (
 )
 
 type AddMoneyRecord struct {
-	ID      int64  `orm:"column(id);auto"`
-	UID     int64  `orm:"column(uid);"`
-	Address string `orm:"column(address);size(40)"`
-	Hash    string `orm:"column(hash);size(64)"`
-	Money   string `orm:"column(money);size(128)"`
-	Type    int    `orm:"column(type)"`
-	Status  int    `orm:"column(status);"`
-	Time    int64  `orm:"column(time);"`
+	ID           int64  `orm:"column(id);auto"`
+	UID          int64  `orm:"column(uid);"`
+	Address      string `orm:"column(address);size(40)"`
+	Hash         string `orm:"column(hash);size(64)"`
+	Money        string `orm:"column(money);size(128)"`
+	Type         int    `orm:"column(type)"`
+	Status       int    `orm:"column(status);"`
+	Time         int64  `orm:"column(time);"`
+	CheckedBlock int64
 }
 
 func (t *AddMoneyRecord) TableName() string {

@@ -1,10 +1,15 @@
 package backserver
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"strconv"
 	"time"
 
 	"github.com/hongyuefan/tmpserver/ethscan"
 	"github.com/hongyuefan/tmpserver/models"
+	"github.com/hongyuefan/tmpserver/tools"
 	"github.com/hongyuefan/tmpserver/types"
 )
 
@@ -82,6 +87,69 @@ func (s *Server) changeRecord(id int64, status int, money, hash string) error {
 	return models.UpdateRecord(&models.AddMoneyRecord{ID: id, Status: status}, "status", "money", "hash")
 }
 
+type EthPrice struct {
+	Price string `json:"price_usd"`
+}
+
+func (s *Server) getPrice() (float64, error) {
+
+	rsp, err := tools.Get("https://api.coinmarketcap.com/v1/ticker/ethereum/")
+
+	if err != nil {
+		return 0, err
+	}
+
+	byt, err := ioutil.ReadAll(rsp.Body)
+
+	if err != nil {
+		return 0, err
+	}
+
+	var eths []EthPrice
+
+	if err := json.Unmarshal(byt, &eths); err != nil {
+		return 0, err
+	}
+
+	return strconv.ParseFloat(eths[0].Price, 64)
+}
+
+func (s *Server) addMoney(uid int64, eth string) {
+
+	var money float64
+
+	member := &models.Member{UID: uid}
+
+	if err := models.GetMember(member, "uid"); err != nil {
+		fmt.Println("addMoney GetMember error uid: ", uid, "eth:", eth, "error:", err.Error())
+		return
+	}
+
+	feth, err := strconv.ParseFloat(eth, 64)
+	if err != nil {
+		fmt.Println("addMoney ParseFloat error uid: ", uid, "eth:", eth, "error:", err.Error())
+		return
+	}
+
+	price, err := s.getPrice()
+	if err != nil {
+		fmt.Println("addMoney getprice error uid: ", uid, "eth:", eth, "error:", err.Error())
+		return
+	}
+
+	money = feth * price
+
+	member.Money += money
+
+	if err := models.UpdateMember(member, "money"); err != nil {
+		fmt.Println("addMoney UpdateMember error uid: ", uid, "eth:", eth, "error:", err.Error())
+
+		return
+	}
+
+	return
+}
+
 func (s *Server) Handler() {
 
 	var err error
@@ -117,6 +185,7 @@ func (s *Server) Handler() {
 						switch status {
 						case 1:
 							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_SUCCESS}, "status")
+							s.addMoney(data.UID, data.Money)
 							break
 						case 2:
 							if data.CheckedBlock+s.judge < s.curBlockNumber {
@@ -138,6 +207,7 @@ func (s *Server) Handler() {
 						switch status {
 						case 1:
 							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Hash: hash, Money: money, Status: types.STATUS_SUCCESS}, "hash", "money", "status")
+							s.addMoney(data.UID, data.Money)
 							break
 						case 2:
 							if data.CheckedBlock+s.judge < s.curBlockNumber {

@@ -49,6 +49,19 @@ func AddMember(m *Member) (id int64, err error) {
 	return
 }
 
+func UpdateMember(m *Member, cols ...string) (err error) {
+	o := orm.NewOrm()
+	v := Member{UID: m.UID}
+	// ascertain id exists in the database
+	if err = o.Read(&v); err == nil {
+		var num int64
+		if num, err = o.Update(m, cols...); err == nil {
+			fmt.Println("Number of records updated in database:", num)
+		}
+	}
+	return
+}
+
 func UpdateMemberByUserName(m *Member, cols ...string) (err error) {
 	o := orm.NewOrm()
 	v := Member{UserName: m.UserName}

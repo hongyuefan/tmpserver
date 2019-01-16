@@ -205,7 +205,7 @@ func (s *Server) Handler() {
 						s.addMoney(data.UID, data.Money)
 						break
 					case 2:
-						if data.CheckedBlock+s.judge > s.curBlockNumber {
+						if data.CheckedBlock+s.judge < s.curBlockNumber {
 							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
 							delete(s.waitingDatas, data.ID)
 						}
@@ -227,7 +227,7 @@ func (s *Server) Handler() {
 						s.addMoney(data.UID, data.Money)
 						break
 					case 2:
-						if data.CheckedBlock+s.judge > s.curBlockNumber {
+						if data.CheckedBlock+s.judge < s.curBlockNumber {
 							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
 							delete(s.waitingDatas, data.ID)
 						}

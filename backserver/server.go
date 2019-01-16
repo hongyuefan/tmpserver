@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/hongyuefan/tmpserver/ethscan"
@@ -20,6 +21,7 @@ type Server struct {
 	interval       int64
 	judge          int64
 	waitingDatas   map[int64]*models.AddMoneyRecord
+	waitingLock    sync.RWMutex
 	founder        string
 	chanClose      chan bool
 }
@@ -58,8 +60,17 @@ FOR:
 				break FOR
 			}
 			for _, ml := range mls {
-				if _, ok := s.waitingDatas[ml.(models.AddMoneyRecord).ID]; !ok {
+
+				fmt.Println("GetRecord", ml)
+
+				s.waitingLock.RLock()
+				_, ok := s.waitingDatas[ml.(models.AddMoneyRecord).ID]
+				s.waitingLock.RUnlock()
+
+				if !ok {
+					s.waitingLock.Lock()
 					s.waitingDatas[ml.(models.AddMoneyRecord).ID] = s.newRecord(ml.(models.AddMoneyRecord))
+					s.waitingLock.Unlock()
 				}
 			}
 			if len(mls) < 200 {
@@ -171,7 +182,11 @@ func (s *Server) Handler() {
 				continue
 			}
 
-			s.getWaitingDatas()
+			fmt.Println("last block number:", s.curBlockNumber)
+
+			go s.getWaitingDatas()
+
+			s.waitingLock.Lock()
 
 			for _, data := range s.waitingDatas {
 
@@ -188,11 +203,9 @@ func (s *Server) Handler() {
 							s.addMoney(data.UID, data.Money)
 							break
 						case 2:
-							if data.CheckedBlock+s.judge < s.curBlockNumber {
+							if data.CheckedBlock+s.judge > s.curBlockNumber {
 								models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
 								delete(s.waitingDatas, data.ID)
-							} else {
-								data.CheckedBlock = s.curBlockNumber
 							}
 							break
 						case -1:
@@ -203,18 +216,16 @@ func (s *Server) Handler() {
 					}
 				}
 				if data.Type == types.PAY_ERCODE {
-					if status, hash, money, err := s.checkTx(s.preBlockNumber, s.curBlockNumber, data.Address); err != nil {
+					if status, hash, money, err := s.checkTx(data.CheckedBlock, s.curBlockNumber, data.Address); err != nil {
 						switch status {
 						case 1:
 							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Hash: hash, Money: money, Status: types.STATUS_SUCCESS}, "hash", "money", "status")
 							s.addMoney(data.UID, data.Money)
 							break
 						case 2:
-							if data.CheckedBlock+s.judge < s.curBlockNumber {
+							if data.CheckedBlock+s.judge > s.curBlockNumber {
 								models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
 								delete(s.waitingDatas, data.ID)
-							} else {
-								data.CheckedBlock = s.curBlockNumber
 							}
 							break
 						case -1:
@@ -224,6 +235,9 @@ func (s *Server) Handler() {
 					}
 				}
 			}
+
+			s.waitingLock.Unlock()
+
 			s.preBlockNumber = s.curBlockNumber
 		}
 	}

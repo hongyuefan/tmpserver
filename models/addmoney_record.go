@@ -18,7 +18,7 @@ type AddMoneyRecord struct {
 	Type         int    `orm:"column(type)"`
 	Status       int    `orm:"column(status);"`
 	Time         int64  `orm:"column(time);"`
-	CheckedBlock int64  `orm:"-"`
+	CheckedBlock int64  `orm:"column(block);"`
 }
 
 func (t *AddMoneyRecord) TableName() string {

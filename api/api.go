@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hongyuefan/tmpserver/ethscan"
 	"github.com/hongyuefan/tmpserver/models"
 	"github.com/hongyuefan/tmpserver/types"
 	"github.com/hongyuefan/tmpserver/util/log"
@@ -27,6 +28,7 @@ func (h *Handlers) HandlerAddMoney(c *gin.Context) {
 		reqAdd types.ReqAddMoney
 		member models.Member
 		record models.AddMoneyRecord
+		block  int64
 	)
 
 	if err = c.BindJSON(&reqAdd); err != nil {
@@ -47,6 +49,12 @@ func (h *Handlers) HandlerAddMoney(c *gin.Context) {
 	record.Type = reqAdd.Type
 	record.UID = member.UID
 	record.Time = reqAdd.Time
+
+	if block, err = ethscan.GetLastBlock(); err != nil {
+		log.GetLog().LogWrite("GetLastBlock Error,Uid:", record.UID, "Address:", record.Address, "Hash:", record.Hash, "Money:", record.Money)
+	} else {
+		record.CheckedBlock = block - 2
+	}
 
 	if _, err = models.AddRecord(&record); err != nil {
 		goto errDeal

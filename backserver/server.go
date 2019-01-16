@@ -196,44 +196,48 @@ func (s *Server) Handler() {
 					if data.Hash == "" {
 						models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
 					}
-					if status, err := s.checkTxByHash(data.Hash); err != nil {
-						switch status {
-						case 1:
-							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_SUCCESS}, "status")
-							s.addMoney(data.UID, data.Money)
-							break
-						case 2:
-							if data.CheckedBlock+s.judge > s.curBlockNumber {
-								models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
-								delete(s.waitingDatas, data.ID)
-							}
-							break
-						case -1:
+
+					status, _ := s.checkTxByHash(data.Hash)
+
+					switch status {
+					case 1:
+						models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_SUCCESS}, "status")
+						s.addMoney(data.UID, data.Money)
+						break
+					case 2:
+						if data.CheckedBlock+s.judge > s.curBlockNumber {
 							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
 							delete(s.waitingDatas, data.ID)
-
 						}
+						break
+					case -1:
+						models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
+						delete(s.waitingDatas, data.ID)
+
 					}
+
 				}
 				if data.Type == types.PAY_ERCODE {
-					if status, hash, money, err := s.checkTx(data.CheckedBlock, s.curBlockNumber, data.Address); err != nil {
-						switch status {
-						case 1:
-							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Hash: hash, Money: money, Status: types.STATUS_SUCCESS}, "hash", "money", "status")
-							s.addMoney(data.UID, data.Money)
-							break
-						case 2:
-							if data.CheckedBlock+s.judge > s.curBlockNumber {
-								models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
-								delete(s.waitingDatas, data.ID)
-							}
-							break
-						case -1:
+
+					status, hash, money, _ := s.checkTx(data.CheckedBlock, s.curBlockNumber, data.Address)
+
+					switch status {
+					case 1:
+						models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Hash: hash, Money: money, Status: types.STATUS_SUCCESS}, "hash", "money", "status")
+						s.addMoney(data.UID, data.Money)
+						break
+					case 2:
+						if data.CheckedBlock+s.judge > s.curBlockNumber {
 							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
 							delete(s.waitingDatas, data.ID)
 						}
+						break
+					case -1:
+						models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
+						delete(s.waitingDatas, data.ID)
 					}
 				}
+
 			}
 
 			s.waitingLock.Unlock()

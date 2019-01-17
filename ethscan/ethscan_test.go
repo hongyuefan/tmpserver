@@ -13,5 +13,5 @@ func TestGetTxByHash(t *testing.T) {
 }
 
 func TestGetTx(t *testing.T) {
-	t.Log(GetTx(7080164, 7080174, "0x7c3a1c1a59fd3e62c99f6578c5d17bdfa5e9618b"))
+	t.Log(GetTx(7080311, 7080336, "0xFe8E9198CEb395Bd748Aaff3b6f8d8015E34dC01"))
 }

@@ -78,14 +78,15 @@ FOR:
 
 func (s *Server) newRecord(record models.AddMoneyRecord) *models.AddMoneyRecord {
 	return &models.AddMoneyRecord{
-		ID:      record.ID,
-		UID:     record.UID,
-		Address: record.Address,
-		Hash:    record.Hash,
-		Money:   record.Money,
-		Type:    record.Type,
-		Status:  record.Status,
-		Time:    record.Time,
+		ID:           record.ID,
+		UID:          record.UID,
+		Address:      record.Address,
+		Hash:         record.Hash,
+		Money:        record.Money,
+		Type:         record.Type,
+		Status:       record.Status,
+		Time:         record.Time,
+		CheckedBlock: record.CheckedBlock,
 	}
 }
 func (s *Server) changeRecord(id int64, status int, money, hash string) error {
@@ -219,12 +220,14 @@ func (s *Server) Handler() {
 						delete(s.waitingDatas, data.ID)
 						break
 					case 2:
+						fmt.Println(data.CheckedBlock, s.judge, s.curBlockNumber)
 						if data.CheckedBlock+s.judge < s.curBlockNumber {
 							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
 							delete(s.waitingDatas, data.ID)
 						}
 						break
 					case -1:
+						fmt.Println("-1")
 						models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
 						delete(s.waitingDatas, data.ID)
 					}

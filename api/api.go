@@ -53,7 +53,7 @@ func (h *Handlers) HandlerAddMoney(c *gin.Context) {
 	if block, err = ethscan.GetLastBlock(); err != nil {
 		log.GetLog().LogWrite("GetLastBlock Error,Uid:", record.UID, "Address:", record.Address, "Hash:", record.Hash, "Money:", record.Money)
 	} else {
-		record.CheckedBlock = block - 3
+		record.CheckedBlock = block - 1
 	}
 
 	if _, err = models.AddRecord(&record); err != nil {

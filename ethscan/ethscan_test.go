@@ -9,9 +9,9 @@ func TestGetBlockNumber(t *testing.T) {
 }
 
 func TestGetTxByHash(t *testing.T) {
-	t.Log(GetTxByHash("0x40eb908387324f2b575b4879cd9d7188f69c8fc9d87c901b9e2daaea4b442170"))
+	t.Log(GetTxByHash("0x2663ba0db6909921c469c6bb49ccc9bd3313dce7db1326d40507df78f3bbdd67"))
 }
 
 func TestGetTx(t *testing.T) {
-	t.Log(GetTx(54092, 54192, "0x5abfec25f74cd88437631a7731906932776356f9"))
+	t.Log(GetTx(7080164, 7080174, "0x7c3a1c1a59fd3e62c99f6578c5d17bdfa5e9618b"))
 }

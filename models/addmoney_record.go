@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strings"
 
@@ -40,9 +39,8 @@ func UpdateRecord(m *AddMoneyRecord, cols ...string) (err error) {
 	v := AddMoneyRecord{ID: m.ID}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Update(m, cols...); err == nil {
-			fmt.Println("Number of records updated in database:", num)
+		if _, err = o.Update(m, cols...); err != nil {
+			return err
 		}
 	}
 	return

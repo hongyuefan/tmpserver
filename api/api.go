@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hongyuefan/tmpserver/ethscan"
@@ -42,8 +43,8 @@ func (h *Handlers) HandlerAddMoney(c *gin.Context) {
 		goto errDeal
 	}
 
-	record.Address = reqAdd.Address
-	record.Hash = reqAdd.Hash
+	record.Address = strings.ToLower(reqAdd.Address)
+	record.Hash = strings.ToLower(reqAdd.Hash)
 	record.Money = reqAdd.Amount
 	record.Status = types.STATUS_WAITING
 	record.Type = reqAdd.Type

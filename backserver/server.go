@@ -97,6 +97,51 @@ type EthPrice struct {
 	Price string `json:"price_usd"`
 }
 
+type Exchange struct {
+	Reason    string   `json:"reason"`
+	Result    ExResult `json:"result"`
+	ErrorCode int64    `json:"error_code"`
+}
+
+type ExResult struct {
+	Update string     `json:"update"`
+	List   [][]string `json:"list"`
+}
+
+func (s *Server) getExchange() (float64, error) {
+
+	rsp, err := tools.Get("http://op.juhe.cn/onebox/exchange/query?key=de0438b501aebc296fa9cdeb0632b1f7")
+
+	if err != nil {
+		return 0, err
+	}
+
+	byt, err := ioutil.ReadAll(rsp.Body)
+
+	if err != nil {
+		return 0, err
+	}
+	var exchanges Exchange
+
+	if err := json.Unmarshal(byt, &exchanges); err != nil {
+		return 0, err
+	}
+
+	for _, result := range exchanges.Result.List {
+		if result[0] == "美元" {
+
+			iEx, err := strconv.ParseFloat(result[3], 64)
+			if err != nil {
+				return 0, err
+			}
+
+			return iEx / float64(100), nil
+		}
+	}
+
+	return 0, fmt.Errorf("cannt get exchange")
+}
+
 func (s *Server) getPrice() (float64, error) {
 
 	rsp, err := tools.Get("https://api.coinmarketcap.com/v1/ticker/ethereum/")
@@ -142,8 +187,12 @@ func (s *Server) addMoney(uid int64, eth string) {
 		fmt.Println("addMoney getprice error uid: ", uid, "eth:", eth, "error:", err.Error())
 		return
 	}
+	exch, err := s.getExchange()
+	if err != nil {
+		exch = 6.7
+	}
 
-	money = feth * price
+	money = feth * price * exch
 
 	member.Money += money
 
@@ -215,7 +264,10 @@ func (s *Server) Handler() {
 
 					switch status {
 					case 1:
-						models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Hash: hash, Money: money, Status: types.STATUS_SUCCESS}, "hash", "money", "status")
+						if err := models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Hash: hash, Money: money, Status: types.STATUS_SUCCESS}, "hash", "money", "status"); err != nil {
+							models.UpdateRecord(&models.AddMoneyRecord{ID: data.ID, Status: types.STATUS_FAILED}, "status")
+							break
+						}
 						s.addMoney(data.UID, data.Money)
 						delete(s.waitingDatas, data.ID)
 						break

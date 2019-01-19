@@ -39,7 +39,7 @@ func (h *Handlers) HandlerAddMoney(c *gin.Context) {
 	member.UserName = reqAdd.UserName
 	member.UID = reqAdd.UserId
 
-	if err = models.GetMember(&member, "uid", "username"); err != nil {
+	if err = models.GetMember(&member, "uid", "mobile"); err != nil {
 		goto errDeal
 	}
 

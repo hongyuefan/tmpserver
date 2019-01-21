@@ -2,7 +2,9 @@ package api
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hongyuefan/tmpserver/ethscan"
@@ -50,6 +52,10 @@ func (h *Handlers) HandlerAddMoney(c *gin.Context) {
 	record.Type = reqAdd.Type
 	record.UID = member.UID
 	record.Time = reqAdd.Time
+
+	if record.Hash == "" {
+		record.Hash = GenCode(64)
+	}
 
 	if block, err = ethscan.GetLastBlock(); err != nil {
 		log.GetLog().LogWrite("GetLastBlock Error,Uid:", record.UID, "Address:", record.Address, "Hash:", record.Hash, "Money:", record.Money)
@@ -113,4 +119,41 @@ func responseWrite(ctx *gin.Context, isSuccess bool, result string) {
 		"isSuccess": isSuccess,
 		"message":   result,
 	})
+}
+
+func GetChar_Num() (c string) {
+	return string(byte(GetRand(48, 58)))
+}
+func GetChar_Cap() (c string) {
+	return string(byte(GetRand(65, 91)))
+}
+func GetChar_Low() (c string) {
+	return string(byte(GetRand(97, 123)))
+}
+func GetRand(min float64, max float64) (result float64) {
+	source := rand.NewSource(time.Now().UnixNano())
+	nRand := rand.New(source)
+	return nRand.Float64()*(max-min) + min
+}
+func GenCode(n int) (code string) {
+	var (
+		rand int
+		str  string
+	)
+	for i := 0; i < n; i++ {
+		rand = int(GetRand(0, 3))
+		time.Sleep(time.Nanosecond)
+		switch rand {
+		case 0:
+			str += GetChar_Num()
+			continue
+		case 1:
+			str += GetChar_Low()
+			continue
+		case 2:
+			str += GetChar_Cap()
+			continue
+		}
+	}
+	return str
 }

@@ -13,7 +13,7 @@ func TestPares(t *testing.T) {
 		panic(err)
 	}
 
-	auto := NewAutoMan(10)
+	auto := NewAutoMan(20)
 
 	auto.OnStart()
 }

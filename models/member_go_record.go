@@ -9,19 +9,26 @@ import (
 )
 
 type MgoRecord struct {
-	ID         int64   `orm:"column(id)"`
-	Code       string  `orm:"column(code);size(20)"`
-	UserName   string  `orm:"column(username);size(30)"`
-	Uphoto     string  `orm:"column(uphoto);size(255)"`
-	UID        int64   `orm:"column(uid);"`
-	ShopID     int64   `orm:"column(shopid);"`
-	ShopName   string  `orm:"column(shopname);size(255)"`
-	ShopQiShu  int32   `orm:"column(shopqishu);"`
-	GoNumber   int32   `orm:"column(gonumber);"`
-	GouCode    string  `orm:"column(goucode);size(2048)"`
-	MoneyCount float64 `orm:"column(moneycount);"`
-	Status     string  `orm:"column(status);size(32)"`
-	Time       string  `orm:"column(time);size(21)"`
+	ID          int64   `orm:"column(id)"`
+	Code        string  `orm:"column(code);size(20)"`
+	UserName    string  `orm:"column(username);size(30)"`
+	Uphoto      string  `orm:"column(uphoto);size(255)"`
+	UID         int64   `orm:"column(uid);"`
+	ShopID      int64   `orm:"column(shopid);"`
+	ShopName    string  `orm:"column(shopname);size(255)"`
+	ShopQiShu   int32   `orm:"column(shopqishu);"`
+	GoNumber    int32   `orm:"column(gonumber);"`
+	GouCode     string  `orm:"column(goucode);size(2048)"`
+	HouDe       string  `orm:"column(huode);size(50)"`
+	MoneyCount  float64 `orm:"column(moneycount);"`
+	Status      string  `orm:"column(status);size(32)"`
+	Company     string  `orm:"column(company);size(18))"`
+	ComCode     string  `orm:"column(company_code);size(20)"`
+	ComMoney    int64   `orm:"column(company_money);"`
+	Address     string  `orm:"column(address);size(1024)"`
+	Phone       string  `orm:"column(order_phone);size(11)"`
+	ConfirmAddr int64   `orm:"column(confirm_address);"`
+	Time        string  `orm:"column(time);size(21)"`
 }
 
 func (t *MgoRecord) TableName() string {

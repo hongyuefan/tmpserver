@@ -39,53 +39,58 @@ func (s *AutoMan) handler() {
 
 	man, err := s.selectMan()
 	if err != nil {
-		fmt.Errorf("selectMan error:%v", err.Error())
+		fmt.Println("selectMan error:", err.Error())
 		return
 	}
 	fmt.Println(man)
 
 	shopList, err := s.selectShop()
 	if err != nil {
-		fmt.Errorf("selectShop error:%v", err.Error())
+		fmt.Println("selectShop error:", err.Error())
 		return
 	}
 	fmt.Println(shopList)
 
-	code, err := s.getShopCode(shopList.ID, shopList.QiShu)
+	code, err := s.getShopCode(shopList.ID)
 	if err != nil {
-		fmt.Errorf("getShopCode error:%v", err.Error())
+		fmt.Println("getShopCode error:", err.Error())
 		return
 	}
 	fmt.Println(code)
 
 	_, err = models.AddMgoRecord(&models.MgoRecord{
-		Code:       "A" + fmt.Sprintf("%v", time.Now().UnixNano()/100),
-		UserName:   man.UserName,
-		Uphoto:     man.Headimg,
-		UID:        man.UID,
-		ShopID:     shopList.ID,
-		ShopName:   shopList.Title,
-		ShopQiShu:  shopList.QiShu,
-		GoNumber:   1,
-		GouCode:    code,
-		MoneyCount: 1,
-		Time:       fmt.Sprintf("%v", time.Now().Unix()),
+		Code:        "A" + fmt.Sprintf("%v", time.Now().UnixNano()/100),
+		UserName:    man.UserName,
+		Uphoto:      man.Headimg,
+		UID:         man.UID,
+		ShopID:      shopList.ID,
+		ShopName:    shopList.Title,
+		ShopQiShu:   shopList.QiShu,
+		GoNumber:    1,
+		GouCode:     code,
+		MoneyCount:  1,
+		Company:     "dasdd",
+		ComCode:     "1000",
+		Address:     "beijing",
+		Phone:       "13422343156",
+		ConfirmAddr: 1,
+		Time:        fmt.Sprintf("%v", time.Now().Unix()),
 	})
 	if err != nil {
-		fmt.Errorf("addMgoRecord error:%v", err.Error())
+		fmt.Println("addMgoRecord error:", err.Error())
 		return
 	}
 
 	if err := models.UpdateMember(&models.Member{
 		UID:   man.UID,
 		Money: man.Money - 1,
-	}); err != nil {
-		fmt.Errorf("updateMember error:%v", err.Error())
+	}, "money"); err != nil {
+		fmt.Println("updateMember error:", err.Error())
 		return
 	}
 
 	if err := s.updateShop(shopList.ID, shopList.CanY+1, shopList.SanY-1); err != nil {
-		fmt.Errorf("updateShop error:%v", err.Error())
+		fmt.Println("updateShop error:", err.Error())
 		return
 	}
 
@@ -144,20 +149,16 @@ func (s *AutoMan) selectShop() (models.ShopList, error) {
 	return mapShopList[int32(GetRand(0, float64(len(mapShopList))))], nil
 }
 
-func (s *AutoMan) getShopCode(shopId int64, qishu int32) (string, error) {
+func (s *AutoMan) getShopCode(shopId int64) (string, error) {
 
 	query := make(map[string]string, 0)
 
-	fmt.Println(shopId, qishu)
-
 	query["s_id"] = fmt.Sprintf("%v", shopId)
-	query["s_cid"] = fmt.Sprintf("%v", qishu)
 
 	mls, err := models.GetShopCodes(query, []string{}, []string{"s_len"}, []string{"asc"}, 0, 10)
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(mls)
 
 	for _, ml := range mls {
 		if ml.(models.ShopCode).SLen > 0 {
@@ -165,12 +166,11 @@ func (s *AutoMan) getShopCode(shopId int64, qishu int32) (string, error) {
 			if code == "" {
 				continue
 			}
-			fmt.Println(code)
 			models.UpdateShopCode(&models.ShopCode{
 				ID:     ml.(models.ShopCode).ID,
 				SLen:   index,
 				SCodes: newCodes,
-			})
+			}, "s_len", "s_codes")
 			return code, nil
 		}
 	}

@@ -3,10 +3,12 @@ package api
 import (
 	"fmt"
 	"math/rand"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hongyuefan/tmpserver/automan"
 	"github.com/hongyuefan/tmpserver/ethscan"
 	"github.com/hongyuefan/tmpserver/models"
 	"github.com/hongyuefan/tmpserver/types"
@@ -14,6 +16,7 @@ import (
 )
 
 type Handlers struct {
+	auto *automan.AutoMan
 }
 
 func NewHandlers() *Handlers {
@@ -23,6 +26,43 @@ func NewHandlers() *Handlers {
 
 func (h *Handlers) OnClose() {
 
+}
+
+func (h *Handlers) HandlerAutoManStop(c *gin.Context) {
+
+	if h.auto != nil {
+		h.auto.OnClose()
+	}
+	HandleSuccessMsg(c, "HandlerAutoManStop", "success")
+	return
+}
+
+func (h *Handlers) HandlerAutoManStart(c *gin.Context) {
+	var (
+		err      error
+		intervel int64
+	)
+	sTime := c.Query("intervel")
+
+	fmt.Println(sTime)
+
+	if intervel, err = strconv.ParseInt(sTime, 10, 64); err != nil {
+		goto errDeal
+	}
+
+	if h.auto != nil {
+		h.auto.OnClose()
+	}
+
+	h.auto = automan.NewAutoMan(intervel)
+
+	go h.auto.OnStart()
+
+	HandleSuccessMsg(c, "HandlerAutoManStart", "success")
+	return
+errDeal:
+	HandleErrorMsg(c, "HandlerAutoManStart", err.Error())
+	return
 }
 
 func (h *Handlers) HandlerAddMoney(c *gin.Context) {

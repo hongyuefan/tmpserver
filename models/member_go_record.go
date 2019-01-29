@@ -22,6 +22,7 @@ type MgoRecord struct {
 	HouDe       string  `orm:"column(huode);size(50)"`
 	MoneyCount  float64 `orm:"column(moneycount);"`
 	Status      string  `orm:"column(status);size(32)"`
+	PayType     string  `orm:"column(pay_type)"`
 	Company     string  `orm:"column(company);size(18))"`
 	ComCode     string  `orm:"column(company_code);size(20)"`
 	ComMoney    int64   `orm:"column(company_money);"`

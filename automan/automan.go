@@ -69,11 +69,13 @@ func (s *AutoMan) handler() {
 		GoNumber:    1,
 		GouCode:     code,
 		MoneyCount:  1,
-		Company:     "dasdd",
-		ComCode:     "1000",
-		Address:     "beijing",
-		Phone:       "13422343156",
-		ConfirmAddr: 1,
+		Status:      "已付款,未发货,未完成",
+		PayType:     "账户",
+		Company:     " ",
+		ComCode:     " ",
+		Address:     " ",
+		Phone:       " ",
+		ConfirmAddr: 0,
 		Time:        fmt.Sprintf("%v", time.Now().Unix()),
 	})
 	if err != nil {

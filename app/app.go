@@ -84,6 +84,7 @@ func (app *App) OnStart(c *config.Config) error {
 		v1.POST("/recharge/add/record", app.handlers.HandlerAddMoney)
 		v1.GET("/automan/start", app.handlers.HandlerAutoManStart)
 		v1.GET("/automan/stop", app.handlers.HandlerAutoManStop)
+		v1.GET("/account/add", app.handlers.HandlerAddMembers)
 	}
 
 	fmt.Println("Listen:", g_ConfigData.Port)

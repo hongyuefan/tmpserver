@@ -64,7 +64,45 @@ errDeal:
 }
 
 func (h *Handlers) HandlerAddMembers(c *gin.Context) {
+	var (
+		err   error
+		count int64
+		index int
+		uid   int64
+	)
+	sCount := c.Query("count")
 
+	if count, err = strconv.ParseInt(sCount, 10, 64); err != nil {
+		goto errDeal
+	}
+
+	for index = 0; index < int(count); index++ {
+
+		if uid, err = models.AddMember(&models.Member{
+			Email:      GetRandEmail(),
+			PassWord:   "0830297d73b08e3aaf42ca9905b30ed1",
+			Img:        "photo/member.jpg",
+			GroupId:    1,
+			EmailCode:  "1",
+			MobileCode: "-1",
+			PassCode:   "-1",
+			Money:      0,
+			Level:      3,
+			Time:       time.Now().Unix(),
+		}); err != nil {
+			goto errDeal
+		}
+		if err = models.UpdateMember(&models.Member{UID: uid, Money: 8888.0}, "money"); err != nil {
+			goto errDeal
+		}
+
+	}
+
+	HandleSuccessMsg(c, "HandlerAddMembers", "success")
+	return
+errDeal:
+	HandleErrorMsg(c, "HandlerAddMembers", err.Error())
+	return
 }
 
 func (h *Handlers) HandlerAddMoney(c *gin.Context) {
@@ -161,6 +199,24 @@ func responseWrite(ctx *gin.Context, isSuccess bool, result string) {
 		"isSuccess": isSuccess,
 		"message":   result,
 	})
+}
+
+func GetRandEmail() string {
+
+	var email string
+
+	expends := []string{"@126.com", "@163.com", "@yahoo.com", "@gmail.com", "@sina.com", "@139.com"}
+
+	cCount := GetRand(8, 16)
+
+	for i := 0; i < int(cCount); i++ {
+		email += GetChar_Low()
+		time.Sleep(time.Nanosecond)
+	}
+
+	email += expends[int(GetRand(0, float64(len(expends)-1)))]
+
+	return email
 }
 
 func GetChar_Num() (c string) {

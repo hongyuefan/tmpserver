@@ -78,7 +78,7 @@ func (h *Handlers) HandlerAddMoney(c *gin.Context) {
 		goto errDeal
 	}
 
-	member.UserName = reqAdd.UserName
+	member.Email = reqAdd.UserName
 	member.UID = reqAdd.UserId
 
 	if err = models.GetMember(&member, "uid", "email"); err != nil {

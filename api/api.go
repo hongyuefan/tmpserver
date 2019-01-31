@@ -44,8 +44,6 @@ func (h *Handlers) HandlerAutoManStart(c *gin.Context) {
 	)
 	sTime := c.Query("intervel")
 
-	fmt.Println(sTime)
-
 	if intervel, err = strconv.ParseInt(sTime, 10, 64); err != nil {
 		goto errDeal
 	}
@@ -63,6 +61,10 @@ func (h *Handlers) HandlerAutoManStart(c *gin.Context) {
 errDeal:
 	HandleErrorMsg(c, "HandlerAutoManStart", err.Error())
 	return
+}
+
+func (h *Handlers) HandlerAddMembers(c *gin.Context) {
+
 }
 
 func (h *Handlers) HandlerAddMoney(c *gin.Context) {

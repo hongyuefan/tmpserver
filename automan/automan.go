@@ -33,6 +33,9 @@ func (s *AutoMan) OnStart() {
 		default:
 			s.handler()
 		}
+		if s.intervel < 3600 {
+			s.intervel = 3600
+		}
 		time.Sleep(time.Second * time.Duration(s.intervel))
 	}
 }
@@ -76,7 +79,7 @@ func (s *AutoMan) handler() {
 		Address:     " ",
 		Phone:       " ",
 		ConfirmAddr: 0,
-		Time:        fmt.Sprintf("%v", time.Now().UnixNano()),
+		Time:        fmt.Sprintf("%v.%v", time.Now().Unix(), int(GetRand(100, 999))),
 	})
 	if err != nil {
 		fmt.Println("addMgoRecord error:", err.Error())

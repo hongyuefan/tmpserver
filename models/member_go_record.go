@@ -11,6 +11,7 @@ import (
 type MgoRecord struct {
 	ID          int64   `orm:"column(id)"`
 	Code        string  `orm:"column(code);size(20)"`
+	CodeTmp     int32   `orm:"column(code_tmp);"`
 	UserName    string  `orm:"column(username);size(30)"`
 	Uphoto      string  `orm:"column(uphoto);size(255)"`
 	UID         int64   `orm:"column(uid);"`

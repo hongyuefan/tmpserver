@@ -12,6 +12,7 @@ import (
 
 type AutoMan struct {
 	intervel  int64
+	mapCity   map[string]string
 	chanClose chan bool
 }
 
@@ -19,6 +20,7 @@ func NewAutoMan(intervel int64) *AutoMan {
 	return &AutoMan{
 		intervel:  intervel,
 		chanClose: make(chan bool, 0),
+		mapCity:   make(map[string]string, 0),
 	}
 }
 
@@ -42,27 +44,25 @@ func (s *AutoMan) handler() {
 		fmt.Println("selectMan error:", err.Error())
 		return
 	}
-	fmt.Println(man)
 
 	shopList, err := s.selectShop()
 	if err != nil {
 		fmt.Println("selectShop error:", err.Error())
 		return
 	}
-	fmt.Println(shopList)
 
 	code, err := s.getShopCode(shopList.ID)
 	if err != nil {
 		fmt.Println("getShopCode error:", err.Error())
 		return
 	}
-	fmt.Println(code)
 
 	_, err = models.AddMgoRecord(&models.MgoRecord{
 		Code:        "A" + fmt.Sprintf("%v", time.Now().UnixNano()/100),
 		UserName:    man.UserName,
-		Uphoto:      man.Headimg,
+		Uphoto:      man.Img,
 		UID:         man.UID,
+		CodeTmp:     0,
 		ShopID:      shopList.ID,
 		ShopName:    shopList.Title,
 		ShopQiShu:   shopList.QiShu,
@@ -76,7 +76,7 @@ func (s *AutoMan) handler() {
 		Address:     " ",
 		Phone:       " ",
 		ConfirmAddr: 0,
-		Time:        fmt.Sprintf("%v", time.Now().Unix()),
+		Time:        fmt.Sprintf("%v", time.Now().UnixNano()),
 	})
 	if err != nil {
 		fmt.Println("addMgoRecord error:", err.Error())
@@ -250,3 +250,10 @@ func GetRand(min float64, max float64) (result float64) {
 	nRand := rand.New(source)
 	return nRand.Float64()*(max-min) + min
 }
+
+//func initMapCity() map[string][]string {
+
+//	mapCity := make(map[string]([]string), 0)
+
+//	mapCity = {"北京":{"北京"},"天津":{"天津"},"河北":{"石家庄","唐山","秦皇岛","邯郸","邢台","保定","张家口","承德"},"山东":{"滨州","德州","枣庄","青岛","济南","烟台","威海","淄博","潍坊","东营"},"山西":{"长治","晋城","朔州","忻州","吕梁","晋中","临汾"}}
+//}

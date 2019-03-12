@@ -28,6 +28,27 @@ func (h *Handlers) OnClose() {
 
 }
 
+func (h *Handlers) HandlerGetLastBlockNumber(c *gin.Context) {
+	var (
+		err         error
+		blockNumber int64
+	)
+
+	if blockNumber, err = ethscan.GetLastBlock(); err != nil {
+		goto errDeal
+	}
+
+	c.JSON(200, gin.H{
+		"isSuccess": true,
+		"message":   blockNumber,
+	})
+
+	return
+errDeal:
+	HandleErrorMsg(c, "HandlerGetLastBlockNumber", err.Error())
+	return
+}
+
 func (h *Handlers) HandlerGetBlock(c *gin.Context) {
 	var (
 		blockNumber, timeStamp, lucky int64

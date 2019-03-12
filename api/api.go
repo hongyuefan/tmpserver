@@ -49,7 +49,7 @@ func (h *Handlers) HandlerGetBlock(c *gin.Context) {
 
 	stimeStamp = time.Unix(timeStamp, 0).Format(base_format)
 
-	lucky, err = strconv.ParseInt(blockHash[len(blockHash)-8:], 0, 64)
+	lucky, err = strconv.ParseInt("0x"+blockHash[len(blockHash)-8:], 0, 64)
 
 	if err != nil {
 		goto errDeal

@@ -9,6 +9,18 @@ import (
 	"github.com/hongyuefan/tmpserver/tools"
 )
 
+type RspHashByBlockNumber struct {
+	JsonRpc string      `json:"jsonrpc"`
+	Id      int64       `json:"id"`
+	Result  BlockDetail `json:"result"`
+}
+
+type BlockDetail struct {
+	Hash      string `json:"hash"`
+	Number    string `json:"number"`
+	TimeStamp string `json:"timestamp"`
+}
+
 type RspBlockNumber struct {
 	JsonRpc string `json:"jsonrpc"`
 	Id      int64  `json:"id"`
@@ -29,6 +41,30 @@ type Transaction struct {
 	IsError     string `json:"isError"`
 	ErrCode     string `json:"errCode"`
 	Hash        string `json:"hash"`
+}
+
+func GetBlockByBlockNumber(blockNumber int64) (blockHash, hexBlockNumber, timeStamp string, error error) {
+
+	var rspHashByBlockNumber RspHashByBlockNumber
+
+	url := fmt.Sprintf("https://api.etherscan.io/api?module=proxy&action=eth_getBlockByNumber&tag=%#x&boolean=true&apikey=FIE4TCCJBDQ48VMA99H8F5X7FVQJ98JISA", blockNumber)
+
+	rsp, err := tools.Get(url)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	body, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	if err := json.Unmarshal(body, &rspHashByBlockNumber); err != nil {
+		return "", "", "", err
+	}
+
+	return rspHashByBlockNumber.Result.Hash, rspHashByBlockNumber.Result.Number, rspHashByBlockNumber.Result.TimeStamp, nil
+
 }
 
 func GetLastBlock() (int64, error) {

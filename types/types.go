@@ -18,3 +18,10 @@ type ReqAddMoney struct {
 	Address  string `json:"address"`
 	Time     int64  `json:"time"`
 }
+
+type RspBlockHash struct {
+	BlockNumber int64  `json:"blocknumber"`
+	BlockHash   string `json:"blockhash"`
+	LuckyNumber int64  `json:"luckynumber"`
+	Time        string `json:"time"`
+}

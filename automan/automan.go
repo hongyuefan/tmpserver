@@ -26,17 +26,20 @@ func NewAutoMan(intervel int64) *AutoMan {
 
 func (s *AutoMan) OnStart() {
 
+	if s.intervel < 3600 {
+		s.intervel = 3673
+	}
+
+	ticker := time.NewTicker(time.Second * time.Duration(s.intervel))
+
 	for {
 		select {
-		case <-s.chanClose:
-			return
-		default:
+		case <-ticker.C:
 			s.handler()
+		case <-s.chanClose:
+			ticker.Stop()
+			return
 		}
-		if s.intervel < 3600 {
-			s.intervel = 3600
-		}
-		time.Sleep(time.Second * time.Duration(s.intervel))
 	}
 }
 
@@ -100,8 +103,13 @@ func (s *AutoMan) handler() {
 	}
 
 }
+
 func (s *AutoMan) OnClose() {
-	close(s.chanClose)
+	select {
+	case <-s.chanClose:
+	default:
+		close(s.chanClose)
+	}
 }
 
 func (s *AutoMan) updateShop(shopId, canyu, shenyu int64) error {

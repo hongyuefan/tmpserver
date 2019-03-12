@@ -28,6 +28,49 @@ func (h *Handlers) OnClose() {
 
 }
 
+func (h *Handlers) HandlerGetBlock(c *gin.Context) {
+	var (
+		blockNumber, timeStamp, lucky int64
+		blockHash, stimeStamp         string
+		base_format                   string = "2006-01-02 15:04:05"
+		err                           error
+		rspGetBlock                   types.RspBlockHash
+	)
+	sBlockNumber := c.Query("blocknumber")
+
+	if blockNumber, err = strconv.ParseInt(sBlockNumber, 10, 64); err != nil {
+		goto errDeal
+	}
+	if blockHash, _, stimeStamp, err = ethscan.GetBlockByBlockNumber(blockNumber); err != nil {
+		goto errDeal
+	}
+
+	timeStamp, _ = strconv.ParseInt(stimeStamp, 0, 64)
+
+	stimeStamp = time.Unix(timeStamp, 0).Format(base_format)
+
+	lucky, err = strconv.ParseInt(blockHash[len(blockHash)-8:], 0, 64)
+
+	if err != nil {
+		goto errDeal
+	}
+
+	rspGetBlock.BlockHash = blockHash
+	rspGetBlock.Time = stimeStamp
+	rspGetBlock.BlockNumber = blockNumber
+	rspGetBlock.LuckyNumber = lucky
+
+	c.JSON(200, gin.H{
+		"isSuccess": true,
+		"message":   rspGetBlock,
+	})
+
+	return
+errDeal:
+	HandleErrorMsg(c, "HandlerGetBlock", err.Error())
+	return
+}
+
 func (h *Handlers) HandlerAutoManStop(c *gin.Context) {
 
 	if h.auto != nil {

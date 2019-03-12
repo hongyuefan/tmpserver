@@ -85,6 +85,7 @@ func (app *App) OnStart(c *config.Config) error {
 		v1.GET("/automan/start", app.handlers.HandlerAutoManStart)
 		v1.GET("/automan/stop", app.handlers.HandlerAutoManStop)
 		v1.GET("/account/add", app.handlers.HandlerAddMembers)
+		v1.GET("/lucky/number", app.handlers.HandlerGetBlock)
 	}
 
 	fmt.Println("Listen:", g_ConfigData.Port)

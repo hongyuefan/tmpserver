@@ -15,3 +15,10 @@ func TestGetTxByHash(t *testing.T) {
 func TestGetTx(t *testing.T) {
 	t.Log(GetTx(7080311, 7080336, "0xFe8E9198CEb395Bd748Aaff3b6f8d8015E34dC01"))
 }
+
+func TestGetBlockByBlockNumber(t *testing.T) {
+
+	number, _ := GetLastBlock()
+
+	t.Log(GetBlockByBlockNumber(number))
+}

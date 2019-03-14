@@ -87,6 +87,7 @@ func (app *App) OnStart(c *config.Config) error {
 		v1.GET("/account/add", app.handlers.HandlerAddMembers)
 		v1.GET("/lucky/number", app.handlers.HandlerGetBlock)
 		v1.GET("/lucky/lastblocknumber", app.handlers.HandlerGetLastBlockNumber)
+		v1.GET("/kuaidi/query", app.handlers.HandlerGetKuaiDi)
 	}
 
 	fmt.Println("Listen:", g_ConfigData.Port)

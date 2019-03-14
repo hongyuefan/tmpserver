@@ -25,3 +25,11 @@ type RspBlockHash struct {
 	LuckyNumber int64  `json:"luckynumber"`
 	Time        string `json:"time"`
 }
+
+type RspAuto struct {
+	Auto []AutoSt `json:"auto"`
+}
+
+type AutoSt struct {
+	ComCode string `json:"comCode"`
+}

@@ -1,8 +1,12 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -25,6 +29,44 @@ func NewHandlers() *Handlers {
 }
 
 func (h *Handlers) OnClose() {
+
+}
+
+func (h *Handlers) HandlerGetKuaiDi(c *gin.Context) {
+	var (
+		err     error
+		rspAuto types.RspAuto
+		info    string
+		url     string
+	)
+
+	postid := c.Query("postid")
+
+	auto, err := Get("http://www.kuaidi100.com/autonumber/autoComNum?text=" + postid)
+	if err != nil {
+		goto errDeal
+	}
+
+	if err = json.Unmarshal([]byte(auto), &rspAuto); err != nil {
+		goto errDeal
+	}
+	if len(rspAuto.Auto) <= 0 {
+		goto errDeal
+	}
+
+	url = "http://www.kuaidi100.com/query?type=" + rspAuto.Auto[0].ComCode + "&postid=" + postid
+
+	info, err = Get(url)
+	if err != nil {
+		goto errDeal
+	}
+
+	c.String(200, info)
+
+	return
+errDeal:
+	HandleErrorMsg(c, "HandlerGetKuaiDi", err.Error())
+	return
 
 }
 
@@ -281,6 +323,17 @@ func GetRandEmail() string {
 	email += expends[int(GetRand(0, float64(len(expends)-1)))]
 
 	return email
+}
+
+func Get(url string) (b string, err error) {
+	body, err := http.Get(url)
+	if err != nil {
+		return
+	}
+	buf := new(bytes.Buffer)
+	io.Copy(buf, body.Body)
+	b = buf.String()
+	return
 }
 
 func GetChar_Num() (c string) {

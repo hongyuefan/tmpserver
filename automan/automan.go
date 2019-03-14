@@ -26,8 +26,8 @@ func NewAutoMan(intervel int64) *AutoMan {
 
 func (s *AutoMan) OnStart() {
 
-	if s.intervel < 3600 {
-		s.intervel = 3673
+	if s.intervel < 300 {
+		s.intervel = 367
 	}
 
 	ticker := time.NewTicker(time.Second * time.Duration(s.intervel))

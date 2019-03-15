@@ -82,6 +82,7 @@ func (s *AutoMan) handler() {
 		Address:     " ",
 		Phone:       " ",
 		ConfirmAddr: 0,
+		HouDe:       "0",
 		Time:        fmt.Sprintf("%v.%v", time.Now().Unix(), int(GetRand(100, 999))),
 	})
 	if err != nil {

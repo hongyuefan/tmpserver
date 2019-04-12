@@ -69,7 +69,7 @@ func (app *App) OnStart(c *config.Config) error {
 	{
 		v1.POST("/post", app.handlers.HandlerPost)
 		v1.GET("/get", app.handlers.HandlerGet)
-		v1.POST("/recharge/add/record", app.handlers.HandlerAddMoney)
+		v1.POST("/face/member/add", app.handlers.HandlerAddMember)
 	}
 
 	fmt.Println("Listen:", g_ConfigData.Port)

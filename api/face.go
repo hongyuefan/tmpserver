@@ -76,6 +76,15 @@ func GetDescribe(key, scr, url string) error {
 	return nil
 }
 
+func EyeLength(m map[int64]int) int64 {
+
+	switch m[types.EYEBROW_LENGTH] {
+	case 1:
+	case 0:
+	case -1:
+	}
+}
+
 func Computer(o, u, l float64) int {
 	if o > u {
 		return 1

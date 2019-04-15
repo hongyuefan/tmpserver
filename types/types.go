@@ -34,4 +34,9 @@ const (
 	MOUTH_THICKNESS    int64 = 15
 	MOUTH_LIPS_RATIO   int64 = 16
 	CHIN_WIDTH         int64 = 17
+	EYEBROW_HEIGHT     int64 = 18
+	MOUTH_ANGLE        int64 = 19
+	MOUTH_LIPS_EQUAL   int64 = 30
+	FACE_ANGRY         int64 = 31
+	FACE_SHAP          int64 = 32
 )

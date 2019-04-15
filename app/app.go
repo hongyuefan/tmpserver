@@ -19,6 +19,8 @@ type ConfigData struct {
 	Idls    float64
 	LogDir  string
 	SqlConn string
+	Key     string
+	Scr     string
 }
 
 type App struct {
@@ -34,6 +36,8 @@ func OnInitFlag(c *config.Config) (err error) {
 	g_ConfigData.Idls = c.GetFloat("idls")
 	g_ConfigData.LogDir = c.GetString("logdir")
 	g_ConfigData.SqlConn = c.GetString("sqlconn")
+	g_ConfigData.Key = c.GetString("key")
+	g_ConfigData.Scr = c.GetString("scr")
 
 	if "" == g_ConfigData.Port || 0 == g_ConfigData.Idls || "" == g_ConfigData.LogDir {
 		return fmt.Errorf("config not right")
@@ -56,7 +60,7 @@ func (app *App) OnStart(c *config.Config) error {
 		return err
 	}
 
-	app.handlers = api.NewHandlers()
+	app.handlers = api.NewHandlers(g_ConfigData.Key, g_ConfigData.Scr)
 
 	router := gin.Default()
 
@@ -70,6 +74,8 @@ func (app *App) OnStart(c *config.Config) error {
 		v1.POST("/post", app.handlers.HandlerPost)
 		v1.GET("/get", app.handlers.HandlerGet)
 		v1.POST("/face/member/add", app.handlers.HandlerAddMember)
+		v1.POST("face/result/post", app.handlers.HandlerDetection)
+		v1.GET("face/result/get", app.handlers.HandlerDetection)
 	}
 
 	fmt.Println("Listen:", g_ConfigData.Port)

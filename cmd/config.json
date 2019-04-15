@@ -2,6 +2,8 @@
 	"port":"8000",
 	"prof":"10006",
 	"logdir":"./",
-	"sqlconn":"root:30bb9f7ed8@tcp(39.105.5.188:3306)/cyyungoucms",
+	"key":"ARthitTObYeqbmIgbCnHlpDP",
+	"scr":"CxEGjfrOqcZuF6GsqLTIUdlLXg8tO8OV",
+	"sqlconn":"root:30bb9f7ed8@tcp(localhost:3306)/face",
 	"idls":10
 }

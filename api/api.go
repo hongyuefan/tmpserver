@@ -9,11 +9,16 @@ import (
 )
 
 type Handlers struct {
+	Key string
+	Scr string
 }
 
-func NewHandlers() *Handlers {
+func NewHandlers(key, scr string) *Handlers {
 
-	return &Handlers{}
+	return &Handlers{
+		Key: key,
+		Scr: scr,
+	}
 }
 
 func (h *Handlers) OnClose() {
@@ -21,7 +26,21 @@ func (h *Handlers) OnClose() {
 }
 
 func (h *Handlers) HandlerDetection(c *gin.Context) {
+	var (
+		err    error
+		result string
+	)
+	url := c.Query("url")
 
+	if result, err = GetResult(h.Key, h.Scr, url); err != nil {
+		goto errDeal
+	}
+
+	HandleSuccessMsg(c, "HandlerDetection", result)
+	return
+errDeal:
+	HandleErrorMsg(c, "HandlerAddMember", err.Error())
+	return
 }
 
 func (h *Handlers) HandlerAddMember(c *gin.Context) {

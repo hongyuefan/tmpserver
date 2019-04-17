@@ -1,6 +1,8 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/hongyuefan/facedetect/features"
 	"github.com/hongyuefan/tmpserver/models"
 	"github.com/hongyuefan/tmpserver/types"
@@ -24,7 +26,7 @@ func NewStand(id int64, name string, upper, lower float64) *Stand {
 
 var mapStand map[int64]*Stand
 
-func init() {
+func OnInit() {
 
 	m := make(map[string]string, 1)
 
@@ -45,37 +47,100 @@ func init() {
 	}
 }
 
-func GetResult(key, scr, url string) (string, error) {
+func GetResult(key, scr, url string) (types.Detect, error) {
 
 	var (
 		mapResult map[int64]int
 		results   []int64
+		detect    types.Detect
 	)
+
+	mapResult = make(map[int64]int, 0)
 
 	points, err := features.GetFeatures(key, scr, url)
 
 	if err != nil {
-		return "", err
+		return detect, err
 	}
 
 	mapResult[types.EYE_LENGTH] = Computer(features.RateEyeSize(points.Landmark150), mapStand[types.EYE_LENGTH].Upper, mapStand[types.EYE_LENGTH].Lower)
+
+	fmt.Println("RateEyeSize", features.RateEyeSize(points.Landmark150))
+
 	mapResult[types.EYE_HEIGHT] = Computer(features.RateEyeWidth(points.Landmark150), mapStand[types.EYE_HEIGHT].Upper, mapStand[types.EYE_HEIGHT].Lower)
+
+	fmt.Println("RateEyeWidth", features.RateEyeWidth(points.Landmark150))
+
 	mapResult[types.EYE_ANGLE] = Computer(features.AngleEye(points.Landmark150), mapStand[types.EYE_ANGLE].Upper, mapStand[types.EYE_ANGLE].Lower)
+
+	fmt.Println("AngleEye", features.AngleEye(points.Landmark150))
+
 	mapResult[types.EYE_TO_EYE] = Computer(features.RateEyeDistance(points.Landmark150), mapStand[types.EYE_TO_EYE].Upper, mapStand[types.EYE_TO_EYE].Lower)
+
+	fmt.Println("RateEyeDistance", features.RateEyeDistance(points.Landmark150))
+
 	mapResult[types.EYE_TO_EYEBROW] = Computer(features.RateEyeToBrow(points.Landmark150), mapStand[types.EYE_TO_EYEBROW].Upper, mapStand[types.EYE_TO_EYEBROW].Lower)
+
+	fmt.Println("RateEyeToBrow", features.RateEyeToBrow(points.Landmark150))
+
 	mapResult[types.EYEBROW_LENGTH] = Computer(features.RateEyeBrowEye(points.Landmark150), mapStand[types.EYEBROW_LENGTH].Upper, mapStand[types.EYEBROW_LENGTH].Lower)
+
+	fmt.Println("RateEyeBrowEye", features.RateEyeBrowEye(points.Landmark150))
+
+	mapResult[types.EYEBROW_HEIGHT] = Computer(features.RateEyeBrowHeight(points.Landmark150), mapStand[types.EYEBROW_HEIGHT].Upper, mapStand[types.EYEBROW_HEIGHT].Lower)
+
+	fmt.Println("RateEyeBrowHeight", features.RateEyeBrowHeight(points.Landmark150))
+
 	mapResult[types.EYEBROW_TO_EYEBROW] = Computer(features.RateEyeBrowToEyeBrow(points.Landmark150), mapStand[types.EYEBROW_TO_EYEBROW].Upper, mapStand[types.EYEBROW_TO_EYEBROW].Lower)
+
+	fmt.Println("RateEyeBrowToEyeBrow", features.RateEyeBrowToEyeBrow(points.Landmark150))
+
 	mapResult[types.EYEBROW_ANGLE] = Computer(features.AngleEyeBrow(points.Landmark150), mapStand[types.EYEBROW_ANGLE].Upper, mapStand[types.EYEBROW_ANGLE].Lower)
+
+	fmt.Println("AngleEyeBrow", features.AngleEyeBrow(points.Landmark150))
+
+	mapResult[types.EYEBROW_ANGLE_MID] = Computer(features.AngleEyeBrowMid(points.Landmark150), mapStand[types.EYEBROW_ANGLE_MID].Upper, mapStand[types.EYEBROW_ANGLE_MID].Lower)
+
+	fmt.Println("AngleEyeBrowMid", features.AngleEyeBrowMid(points.Landmark150))
+
 	mapResult[types.EYEBROW_MAX_RATIO] = Computer(features.RateEyeBrow(points.Landmark150), mapStand[types.EYEBROW_MAX_RATIO].Upper, mapStand[types.EYEBROW_MAX_RATIO].Lower)
+
+	fmt.Println("EYEBROW_MAX_RATIO", features.RateEyeBrow(points.Landmark150))
+
 	mapResult[types.NOSE_WIDTH] = Computer(features.RateNoseWidth(points.Landmark150), mapStand[types.NOSE_WIDTH].Upper, mapStand[types.NOSE_WIDTH].Lower)
+
+	fmt.Println("RateNoseWidth", features.RateNoseWidth(points.Landmark150))
+
 	mapResult[types.NOSE_LENGTH] = Computer(features.RateFaceLength(points.Landmark150), mapStand[types.NOSE_LENGTH].Upper, mapStand[types.NOSE_LENGTH].Lower)
+
+	fmt.Println("NOSE_LENGTH", features.RateFaceLength(points.Landmark150))
+
 	mapResult[types.NOSE_RATIO] = Computer(features.RateNoseEagle(points.Landmark150), mapStand[types.NOSE_RATIO].Upper, mapStand[types.NOSE_RATIO].Lower)
+
+	fmt.Println("RateNoseEagle", features.RateNoseEagle(points.Landmark150))
+
 	mapResult[types.PHILTRUM_LENGTH] = Computer(features.RateRenZLength(points.Landmark150), mapStand[types.PHILTRUM_LENGTH].Upper, mapStand[types.PHILTRUM_LENGTH].Lower)
+
+	fmt.Println("RateRenZLength", features.RateRenZLength(points.Landmark150))
+
 	mapResult[types.MOUTH_WIDTH] = Computer(features.RateMouseLength(points.Landmark150), mapStand[types.MOUTH_WIDTH].Upper, mapStand[types.MOUTH_WIDTH].Lower)
+
+	fmt.Println("RateMouseLength", features.RateMouseLength(points.Landmark150))
+
 	mapResult[types.MOUTH_THICKNESS] = Computer(features.RateMouthLipThickness(points.Landmark150), mapStand[types.MOUTH_THICKNESS].Upper, mapStand[types.MOUTH_THICKNESS].Lower)
+	fmt.Println("RateMouthLipThickness", features.RateMouthLipThickness(points.Landmark150))
+
 	mapResult[types.MOUTH_LIPS_RATIO] = Computer(features.RateMouthLip(points.Landmark150), mapStand[types.MOUTH_LIPS_RATIO].Upper, mapStand[types.MOUTH_LIPS_RATIO].Lower)
+	fmt.Println("MOUTH_LIPS_RATIO", features.RateMouthLip(points.Landmark150))
+
 	mapResult[types.CHIN_WIDTH] = Computer(features.RateChinWidth(points.Landmark150), mapStand[types.CHIN_WIDTH].Upper, mapStand[types.CHIN_WIDTH].Lower)
-	mapResult[types.MOUTH_LIPS_EQUAL] = Computer(features.AngleMouth(points.Landmark150), mapStand[types.MOUTH_LIPS_EQUAL].Upper, mapStand[types.CHIN_WIDTH].Lower)
+	fmt.Println("CHIN_WIDTH", features.RateChinWidth(points.Landmark150))
+
+	mapResult[types.MOUTH_ANGLE] = Computer(features.AngleMouth(points.Landmark150), mapStand[types.MOUTH_ANGLE].Upper, mapStand[types.MOUTH_ANGLE].Lower)
+
+	fmt.Println("MOUTH_ANGLE", features.AngleMouth(points.Landmark150))
+
+	fmt.Println("MOUTH_LIPS_EQUAL", features.RateMouthLip(points.Landmark150))
 
 	if features.RateMouthLip(points.Landmark150) >= 46 && features.RateMouthLip(points.Landmark150) <= 56 {
 		mapResult[types.MOUTH_LIPS_EQUAL] = 1
@@ -88,11 +153,15 @@ func GetResult(key, scr, url string) (string, error) {
 		mapResult[types.FACE_ANGRY] = 0
 	}
 	if points.Faceshap.Type == "square" {
+		mapResult[types.FACE_SHAP] = 2
+	} else if points.Faceshap.Type == "oval" && points.Faceshap.Probability >= 0.6 {
 		mapResult[types.FACE_SHAP] = 1
-	} else if points.Faceshap.Type == "oval" {
-		mapResult[types.FACE_SHAP] = -1
-	} else {
-		mapResult[types.FACE_SHAP] = 0
+	} else if points.Faceshap.Type == "round" {
+		mapResult[types.FACE_SHAP] = 4
+	} else if points.Faceshap.Type == "heart" {
+		mapResult[types.FACE_SHAP] = 3
+	} else if points.Faceshap.Type == "oval" && points.Faceshap.Probability < 0.4 {
+		mapResult[types.FACE_SHAP] = 4
 	}
 
 	results = append(results, EyeResult(mapResult)...)
@@ -103,12 +172,31 @@ func GetResult(key, scr, url string) (string, error) {
 	results = append(results, FaceResult(mapResult)...)
 	results = append(results, ChinResult(mapResult)...)
 
-	return GetDescribe(results), nil
+	detect.Age = points.Age
+	detect.Beauty = points.Beauty
+	detect.Emotion = points.Emotion.Type
+	detect.Expression = points.Expression.Type
+	detect.Gender = points.Gender.Type
+
+	if points.Glasses.Type != "none" {
+		detect.IsGlass = true
+	} else {
+		detect.IsGlass = false
+	}
+	detect.FaceType = points.FaceType.Type
+
+	detect.Race = points.Race.Type
+
+	detect.Descrips = GetDescribe(results)
+
+	return detect, nil
 }
 
-func GetDescribe(results []int64) string {
+func GetDescribe(results []int64) []types.Description {
 
-	var s string
+	var (
+		dess []types.Description
+	)
 
 	for _, result := range results {
 
@@ -120,10 +208,10 @@ func GetDescribe(results []int64) string {
 			continue
 		}
 
-		s = s + des.Des
+		dess = append(dess, types.Description{Title: des.Name, Content: des.Des})
 	}
 
-	return s
+	return dess
 }
 
 func EyeResult(mapResult map[int64]int) []int64 {
@@ -197,7 +285,7 @@ func EyeBrowResult(mapResult map[int64]int) []int64 {
 		result = append(result, 19) //八字眉
 	}
 
-	if mapResult[types.EYEBROW_HEIGHT] != -1 && mapResult[types.EYEBROW_LENGTH] != -1 && mapResult[types.EYEBROW_MAX_RATIO] == 0 {
+	if mapResult[types.EYEBROW_ANGLE] == 0 && mapResult[types.EYEBROW_HEIGHT] != -1 && mapResult[types.EYEBROW_LENGTH] != -1 && mapResult[types.EYEBROW_MAX_RATIO] == 0 && mapResult[types.EYEBROW_ANGLE_MID] == 0 {
 		result = append(result, 20) //一字眉
 	}
 
@@ -260,7 +348,7 @@ func MouthResult(mapResult map[int64]int) []int64 {
 
 	var result []int64
 
-	if mapResult[types.MOUTH_WIDTH] == 1 {
+	if mapResult[types.MOUTH_WIDTH] == 1 && mapResult[types.EYEBROW_TO_EYEBROW] != -1 && mapResult[types.NOSE_WIDTH] == 1 {
 		result = append(result, 30)
 	}
 	if mapResult[types.MOUTH_WIDTH] == -1 {
@@ -294,12 +382,12 @@ func ChinResult(mapResult map[int64]int) []int64 {
 
 	var result []int64
 
-	if mapResult[types.CHIN_WIDTH] == 1 && mapResult[types.FACE_SHAP] != 1 {
-		result = append(result, 40)
-	}
-	if mapResult[types.CHIN_WIDTH] == -1 {
-		result = append(result, 41)
-	}
+	//	if mapResult[types.CHIN_WIDTH] == 1 && mapResult[types.FACE_SHAP] != 1 {
+	//		result = append(result, 40)
+	//	}
+	//	if mapResult[types.CHIN_WIDTH] == -1 {
+	//		result = append(result, 41)
+	//	}
 
 	return result
 }
@@ -308,16 +396,16 @@ func FaceResult(mapResult map[int64]int) []int64 {
 
 	var result []int64
 
-	if mapResult[types.FACE_SHAP] == -1 {
+	if mapResult[types.FACE_SHAP] == 4 {
 		result = append(result, 45)
 	}
 
-	if mapResult[types.FACE_SHAP] == 1 && mapResult[types.CHIN_WIDTH] == 1 {
-		result = append(result, 42)
+	if mapResult[types.FACE_SHAP] == 1 {
+		result = append(result, 41)
 	}
 
-	if mapResult[types.FACE_ANGRY] == 1 {
-		result = append(result, 46)
+	if mapResult[types.FACE_ANGRY] == 2 {
+		result = append(result, 44)
 	}
 
 	return result

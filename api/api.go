@@ -28,15 +28,19 @@ func (h *Handlers) OnClose() {
 func (h *Handlers) HandlerDetection(c *gin.Context) {
 	var (
 		err    error
-		result string
+		detect types.Detect
 	)
 	url := c.Query("url")
 
-	if result, err = GetResult(h.Key, h.Scr, url); err != nil {
+	if detect, err = GetResult(h.Key, h.Scr, url); err != nil {
 		goto errDeal
 	}
 
-	HandleSuccessMsg(c, "HandlerDetection", result)
+	c.JSON(200, types.RspDetect{
+		IsSuccess: true,
+		Result:    detect,
+	})
+
 	return
 errDeal:
 	HandleErrorMsg(c, "HandlerAddMember", err.Error())

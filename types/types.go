@@ -16,6 +16,28 @@ type ReqMember struct {
 	Time   int64  `json:"time"`
 }
 
+type RspDetect struct {
+	IsSuccess bool        `json:"isSuccess"`
+	Result    interface{} `json:"result"`
+}
+
+type Detect struct {
+	Age        int64         `json:"age"`
+	Gender     string        `json:"gender"`
+	Race       string        `json:"race"`
+	Emotion    string        `json:"emotion"`
+	Expression string        `json:"expression"`
+	IsGlass    bool          `json:"glass"`
+	Beauty     float64       `json:"beauty"`
+	FaceType   string        `json:"face_type"`
+	Descrips   []Description `json:"descriptions"`
+}
+
+type Description struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
 const (
 	EYE_LENGTH         int64 = 1
 	EYE_HEIGHT         int64 = 2
@@ -36,6 +58,7 @@ const (
 	CHIN_WIDTH         int64 = 17
 	EYEBROW_HEIGHT     int64 = 18
 	MOUTH_ANGLE        int64 = 19
+	EYEBROW_ANGLE_MID  int64 = 20
 	MOUTH_LIPS_EQUAL   int64 = 30
 	FACE_ANGRY         int64 = 31
 	FACE_SHAP          int64 = 32

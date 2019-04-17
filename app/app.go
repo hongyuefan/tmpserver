@@ -60,6 +60,8 @@ func (app *App) OnStart(c *config.Config) error {
 		return err
 	}
 
+	api.OnInit()
+
 	app.handlers = api.NewHandlers(g_ConfigData.Key, g_ConfigData.Scr)
 
 	router := gin.Default()

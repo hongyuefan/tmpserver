@@ -4,6 +4,6 @@
 	"logdir":"./",
 	"key":"ARthitTObYeqbmIgbCnHlpDP",
 	"scr":"CxEGjfrOqcZuF6GsqLTIUdlLXg8tO8OV",
-	"sqlconn":"root:30bb9f7ed8@tcp(localhost:3306)/face",
+	"sqlconn":"root:30bb9f7ed8@tcp(39.105.5.188:3306)/face?charset=utf8",
 	"idls":10
 }

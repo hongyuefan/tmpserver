@@ -43,7 +43,7 @@ func (h *Handlers) HandlerDetection(c *gin.Context) {
 
 	return
 errDeal:
-	HandleErrorMsg(c, "HandlerAddMember", err.Error())
+	HandleErrorMsg(c, "HandlerDetection", err.Error())
 	return
 }
 
@@ -101,9 +101,8 @@ func HandleDebugMsg(c *gin.Context, requestType string, info string) {
 	log.GetLog().LogDebug(logMsg)
 }
 func HandleErrorMsg(c *gin.Context, requestType string, result string) {
-	msg := fmt.Sprintf("type[%s] From [%s] Error [%s] ", requestType, c.Request.RemoteAddr, result)
-	responseWrite(c, false, msg)
-	log.GetLog().LogError(msg)
+	responseWrite(c, false, result)
+	log.GetLog().LogError(requestType, result)
 }
 func responseWrite(ctx *gin.Context, isSuccess bool, result string) {
 	ctx.JSON(200, gin.H{

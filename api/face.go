@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/hongyuefan/facedetect/features"
 	"github.com/hongyuefan/tmpserver/models"
@@ -176,7 +177,18 @@ func GetResult(key, scr, url string) (types.Detect, error) {
 	detect.Beauty = points.Beauty
 	detect.Emotion = points.Emotion.Type
 	detect.Expression = points.Expression.Type
-	detect.Gender = points.Gender.Type
+
+	if math.Abs(points.Angle.Pitch) > 20 || math.Abs(points.Angle.Roll) > 10 || math.Abs(points.Angle.Yaw) > 10 {
+		detect.IsAngle = true
+	}
+
+	if points.Gender.Type == "female" {
+		detect.Gender = "女"
+	} else if points.Gender.Type == "male" {
+		detect.Gender = "男"
+	} else {
+		detect.Gender = "不详"
+	}
 
 	if points.Glasses.Type != "none" {
 		detect.IsGlass = true

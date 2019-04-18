@@ -28,6 +28,7 @@ type Detect struct {
 	Emotion    string        `json:"emotion"`
 	Expression string        `json:"expression"`
 	IsGlass    bool          `json:"glass"`
+	IsAngle    bool          `json:"angle"`
 	Beauty     float64       `json:"beauty"`
 	FaceType   string        `json:"face_type"`
 	Descrips   []Description `json:"descriptions"`

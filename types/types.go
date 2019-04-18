@@ -10,10 +10,11 @@ const (
 )
 
 type ReqMember struct {
-	OpenId string `json:"openid"`
-	AppId  string `json:"appid"`
-	Count  int64  `json:"count"`
-	Time   int64  `json:"time"`
+	OpenId   string `json:"openid"`
+	AppId    string `json:"appid"`
+	Nick     string `json:"nick"`
+	Gender   int    `json:"gender"`
+	Province string `json:"province"`
 }
 
 type RspDetect struct {

@@ -7,11 +7,14 @@ import (
 )
 
 type Member struct {
-	Id     int64  `orm:"column(id);auto"`
-	OpenId string `orm:"column(openid);size(128)"`
-	AppId  string `orm:"column(appid);size(128)"`
-	Count  int64  `orm:"column(counts);"`
-	Time   int64  `orm:"column(time);"`
+	Id       int64  `orm:"column(id);auto"`
+	OpenId   string `orm:"column(openid);size(128)"`
+	AppId    string `orm:"column(appid);size(128)"`
+	Nick     string `orm:"column(nick);size(128)"`
+	Gender   int    `json:"gender"`
+	Province string `json:"province"`
+	Count    int64  `orm:"column(counts);"`
+	Time     int64  `orm:"column(time);"`
 }
 
 func (t *Member) TableName() string {

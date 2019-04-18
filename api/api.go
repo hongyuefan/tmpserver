@@ -1,9 +1,12 @@
 package api
 
 import (
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hongyuefan/tmpserver/models"
 	"github.com/hongyuefan/tmpserver/types"
 	"github.com/hongyuefan/tmpserver/util/log"
 )
@@ -51,11 +54,26 @@ func (h *Handlers) HandlerAddMember(c *gin.Context) {
 	var (
 		err    error
 		reqAdd types.ReqMember
+		member models.Member
 	)
 
 	if err = c.BindJSON(&reqAdd); err != nil {
 		goto errDeal
 	}
+
+	if reqAdd.Nick == "" {
+		err = errors.New("nick is null")
+		goto errDeal
+	}
+
+	member.AppId = reqAdd.AppId
+	member.Nick = reqAdd.Nick
+	member.OpenId = reqAdd.OpenId
+	member.Gender = reqAdd.Gender
+	member.Province = reqAdd.Province
+	member.Time = time.Now().Unix()
+
+	models.AddMember(&member)
 
 	HandleSuccessMsg(c, "HandlerAddMember", "success")
 	return

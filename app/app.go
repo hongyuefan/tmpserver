@@ -77,6 +77,7 @@ func (app *App) OnStart(c *config.Config) error {
 		v1.GET("/get", app.handlers.HandlerGet)
 		v1.POST("/face/member/add", app.handlers.HandlerAddMember)
 		v1.POST("face/result/post", app.handlers.HandlerDetection)
+		v1.POST("face/member/post", app.handlers.HandlerAddMember)
 		v1.GET("face/result/get", app.handlers.HandlerDetection)
 	}
 

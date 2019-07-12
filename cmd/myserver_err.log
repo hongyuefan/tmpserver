@@ -1,4 +1,0 @@
-2019-01-04 17:01:06,568 [ERROR] api.go:111: type[HandlerAddMoney] From [127.0.0.1:18304] Error [Error 1054: Unknown column 'id' in 'field list'] 
-2019-01-04 17:02:00,325 [ERROR] api.go:111: type[HandlerAddMoney] From [127.0.0.1:18397] Error [Error 1054: Unknown column 'id' in 'field list'] 
-2019-01-04 17:02:56,983 [ERROR] api.go:111: type[HandlerAddMoney] From [127.0.0.1:18498] Error [Error 1054: Unknown column 'heading' in 'field list'] 
-2019-01-04 17:04:36,197 [ERROR] api.go:111: type[HandlerAddMoney] From [127.0.0.1:18603] Error [<QuerySeter> no row found] 

@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/astaxie/beego/orm"
 	gin "github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/hongyuefan/tmpserver/api"
 	"github.com/hongyuefan/tmpserver/util/config"
 	"github.com/hongyuefan/tmpserver/util/log"
@@ -52,10 +50,6 @@ func (app *App) OnStart(c *config.Config) error {
 		return err
 	}
 
-	if err := orm.RegisterDataBase("default", "mysql", g_ConfigData.SqlConn); err != nil {
-		return err
-	}
-
 	app.handlers = api.NewHandlers()
 
 	router := gin.Default()
@@ -65,11 +59,15 @@ func (app *App) OnStart(c *config.Config) error {
 		v0.GET("/health", app.handlers.HandlerGet)
 	}
 
-	v1 := router.Group("/v1")
+	v1 := router.Group("/v1", func(c *gin.Context) {
+
+		fmt.Println("11111111")
+
+		c.Abort()
+	})
 	{
 		v1.POST("/post", app.handlers.HandlerPost)
 		v1.GET("/get", app.handlers.HandlerGet)
-		v1.POST("/recharge/add/record", app.handlers.HandlerAddMoney)
 	}
 
 	fmt.Println("Listen:", g_ConfigData.Port)

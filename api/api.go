@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hongyuefan/tmpserver/models"
-	"github.com/hongyuefan/tmpserver/types"
 	"github.com/hongyuefan/tmpserver/util/log"
 )
 
@@ -18,44 +16,6 @@ func NewHandlers() *Handlers {
 }
 
 func (h *Handlers) OnClose() {
-
-}
-
-func (h *Handlers) HandlerAddMoney(c *gin.Context) {
-	var (
-		err    error
-		reqAdd types.ReqAddMoney
-		member models.Member
-		record models.AddMoneyRecord
-	)
-
-	if err = c.BindJSON(&reqAdd); err != nil {
-		goto errDeal
-	}
-
-	member.UserName = reqAdd.UserName
-	member.UID = reqAdd.UserId
-
-	if err = models.GetMember(&member, "uid", "username"); err != nil {
-		goto errDeal
-	}
-
-	record.Address = reqAdd.Address
-	record.Hash = reqAdd.Hash
-	record.Money = reqAdd.Amount
-	record.Status = types.STATUS_WAITING
-	record.Type = reqAdd.Type
-	record.UID = member.UID
-	record.Time = reqAdd.Time
-
-	if _, err = models.AddRecord(&record); err != nil {
-		goto errDeal
-	}
-	HandleSuccessMsg(c, "HandlerAddMoney", "success")
-	return
-errDeal:
-	HandleErrorMsg(c, "HandlerAddMoney", err.Error())
-	return
 }
 
 func (h *Handlers) HandlerPost(c *gin.Context) {
@@ -78,6 +38,7 @@ func (h *Handlers) HandlerGet(c *gin.Context) {
 	if err != nil {
 		goto errDeal
 	}
+	responseWrite(c, true, "hello world")
 	return
 errDeal:
 	HandleErrorMsg(c, "HandlerGet", err.Error())

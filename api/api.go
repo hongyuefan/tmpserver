@@ -1,68 +1,66 @@
 package api
 
 import (
-	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/hongyuefan/tmpserver/util/log"
 )
 
 type Handlers struct {
+	upGrader  websocket.Upgrader
+	chanClose chan struct{}
+	handler   *Hander
+	gPool     *GPool
 }
 
 func NewHandlers() *Handlers {
+	return &Handlers{
+		upGrader: websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool { return true },
+		},
+		gPool:     NewGPool(100, 1),
+		handler:   &Hander{},
+		chanClose: make(chan struct{}),
+	}
+}
 
-	return &Handlers{}
+func (h *Handlers) OnStart() {
+	h.gPool.Start()
 }
 
 func (h *Handlers) OnClose() {
-}
-
-func (h *Handlers) HandlerPost(c *gin.Context) {
-	var (
-		err error
-	)
-	if err != nil {
-		goto errDeal
-	}
-	return
-errDeal:
-	HandleErrorMsg(c, "HandlerPost", err.Error())
-	return
+	close(h.chanClose)
+	h.gPool.Stop()
 }
 
 func (h *Handlers) HandlerGet(c *gin.Context) {
-	var (
-		err error
-	)
+	ws, err := h.upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		goto errDeal
+		return
 	}
-	responseWrite(c, true, "hello world")
-	return
-errDeal:
-	HandleErrorMsg(c, "HandlerGet", err.Error())
-	return
+	defer ws.Close()
+	for {
+		select {
+		case <-h.chanClose:
+			return
+		default:
+			if err := h.handlerMessage(ws); err != nil {
+				log.GetLog().LogError("ws connect", ws.RemoteAddr().String(), "error", err)
+				return
+			}
+		}
+
+	}
 }
 
-func HandleSuccessMsg(c *gin.Context, requestType, msg string) {
-	responseWrite(c, true, msg)
-	logMsg := fmt.Sprintf("type[%s] From [%s] Params [%s]", requestType, c.Request.RemoteAddr, msg)
-	log.GetLog().LogInfo(logMsg)
-}
-
-func HandleDebugMsg(c *gin.Context, requestType string, info string) {
-	logMsg := fmt.Sprintf("type[%s] From [%s] Params [%s]", requestType, c.Request.RemoteAddr, info)
-	log.GetLog().LogDebug(logMsg)
-}
-func HandleErrorMsg(c *gin.Context, requestType string, result string) {
-	msg := fmt.Sprintf("type[%s] From [%s] Error [%s] ", requestType, c.Request.RemoteAddr, result)
-	responseWrite(c, false, msg)
-	log.GetLog().LogError(msg)
-}
-func responseWrite(ctx *gin.Context, isSuccess bool, result string) {
-	ctx.JSON(200, gin.H{
-		"isSuccess": isSuccess,
-		"message":   result,
-	})
+func (h *Handlers) handlerMessage(ws *websocket.Conn) error {
+	typ, msg, err := ws.ReadMessage()
+	if err != nil {
+		return err
+	}
+	rsp := h.handler.HandleMessage(msg)
+	h.gPool.SendMsg(typ, rsp, ws)
+	return nil
 }

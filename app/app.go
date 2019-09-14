@@ -59,14 +59,8 @@ func (app *App) OnStart(c *config.Config) error {
 		v0.GET("/health", app.handlers.HandlerGet)
 	}
 
-	v1 := router.Group("/v1", func(c *gin.Context) {
-
-		fmt.Println("11111111")
-
-		c.Abort()
-	})
+	v1 := router.Group("/v1")
 	{
-		v1.POST("/post", app.handlers.HandlerPost)
 		v1.GET("/get", app.handlers.HandlerGet)
 	}
 

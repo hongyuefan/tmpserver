@@ -5,38 +5,41 @@ import (
 	"errors"
 )
 
-type Hander struct {
+type CallFunc func([]byte) (interface{}, error)
+
+type Handler struct {
+	mHander map[int]CallFunc
 }
 
-func (h *Hander) HandleMessage(msg []byte) []byte {
+func NewHandler() *Handler {
+	return &Handler{
+		mHander: make(map[int]CallFunc, 64),
+	}
+}
+
+func (h *Handler) RegistHandler(typ int, function CallFunc) {
+	h.mHander[typ] = function
+}
+
+func (h *Handler) HandleMessage(msg []byte) []byte {
 	m := new(ReqMessage)
 	if err := json.Unmarshal(msg, m); err != nil {
 		return h.responseMessage(false, 0, errors.New("msg format error"))
 	}
-	switch m.Typ {
-	case TYPE_USER_LOGIN:
-		rspMsg, err := h.userLogin(m.Data)
-		if err != nil {
-			return h.responseMessage(false, m.Typ, err)
-		}
-		return h.responseMessage(true, m.Typ, rspMsg)
-
+	callFunc, ok := h.mHander[m.Typ]
+	if !ok {
+		return h.responseMessage(false, m.Typ, errors.New("msg type not find"))
 	}
-	return h.responseMessage(false, m.Typ, errors.New("msg type not find"))
+	rspMsg, err := callFunc(m.Data)
+	if err != nil {
+		return h.responseMessage(false, m.Typ, err)
+	}
+	return h.responseMessage(true, m.Typ, rspMsg)
 }
 
-func (h *Hander) responseMessage(success bool, typ int, msg interface{}) []byte {
+func (h *Handler) responseMessage(success bool, typ int, msg interface{}) []byte {
 	bytMsg, _ := json.Marshal(msg)
 	rsp := &RspMessage{Success: success, Typ: typ, Data: bytMsg}
 	rspByt, _ := json.Marshal(rsp)
 	return rspByt
-
-}
-
-func (h *Hander) userLogin(reqMsg []byte) (*RspUserLogin, error) {
-	user := new(ReqUserLogin)
-	if err := json.Unmarshal(reqMsg, user); err != nil {
-		return nil, err
-	}
-	return &RspUserLogin{Token: "123"}, nil
 }

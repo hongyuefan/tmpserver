@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -21,8 +22,9 @@ type GPool struct {
 
 func NewGPool(msgCount, routineCount int) *GPool {
 	return &GPool{
-		chanMsg:   make(chan *Msg, msgCount),
-		chanClose: make(chan struct{}),
+		chanMsg:      make(chan *Msg, msgCount),
+		chanClose:    make(chan struct{}),
+		routineCount: routineCount,
 	}
 }
 
@@ -37,13 +39,16 @@ func (p *GPool) Stop() {
 }
 
 func (p *GPool) handler() {
+	fmt.Println("gpool handler start")
 	for {
 		select {
 		case msg := <-p.chanMsg:
 			if err := msg.ws.WriteMessage(msg.typ, msg.msg); err != nil {
 				log.GetLog().LogError("writeMessage to", msg.ws.RemoteAddr().String(), "error", err.Error())
+				return
 			}
 		case <-p.chanClose:
+			fmt.Println("gpool handler stop")
 			return
 		}
 	}

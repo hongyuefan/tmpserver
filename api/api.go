@@ -11,7 +11,7 @@ import (
 type Handlers struct {
 	upGrader  websocket.Upgrader
 	chanClose chan struct{}
-	handler   *Hander
+	handler   *Handler
 	gPool     *GPool
 }
 
@@ -20,13 +20,14 @@ func NewHandlers() *Handlers {
 		upGrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool { return true },
 		},
-		gPool:     NewGPool(100, 1),
-		handler:   &Hander{},
+		gPool:     NewGPool(1, 1),
+		handler:   NewHandler(),
 		chanClose: make(chan struct{}),
 	}
 }
 
 func (h *Handlers) OnStart() {
+	h.registHandler()
 	h.gPool.Start()
 }
 
@@ -51,7 +52,6 @@ func (h *Handlers) HandlerGet(c *gin.Context) {
 				return
 			}
 		}
-
 	}
 }
 

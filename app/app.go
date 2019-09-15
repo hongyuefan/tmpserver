@@ -52,6 +52,8 @@ func (app *App) OnStart(c *config.Config) error {
 
 	app.handlers = api.NewHandlers()
 
+	app.handlers.OnStart()
+
 	router := gin.Default()
 
 	v0 := router.Group("/v0")
@@ -61,7 +63,7 @@ func (app *App) OnStart(c *config.Config) error {
 
 	v1 := router.Group("/v1")
 	{
-		v1.GET("/get", app.handlers.HandlerGet)
+		v1.GET("/ws/server", app.handlers.HandlerGet)
 	}
 
 	fmt.Println("Listen:", g_ConfigData.Port)

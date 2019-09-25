@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/astaxie/beego/orm"
 	gin "github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/hongyuefan/tmpserver/api"
 	"github.com/hongyuefan/tmpserver/util/config"
 	"github.com/hongyuefan/tmpserver/util/log"
@@ -33,7 +35,7 @@ func OnInitFlag(c *config.Config) (err error) {
 	g_ConfigData.LogDir = c.GetString("logdir")
 	g_ConfigData.SqlConn = c.GetString("sqlconn")
 
-	if "" == g_ConfigData.Port || 0 == g_ConfigData.Idls || "" == g_ConfigData.LogDir {
+	if "" == g_ConfigData.Port || "" == g_ConfigData.LogDir {
 		return fmt.Errorf("config not right")
 	}
 	return
@@ -47,6 +49,10 @@ func (app *App) OnStart(c *config.Config) error {
 	}
 
 	if _, err := log.NewLog(g_ConfigData.LogDir, MasterName, 0); err != nil {
+		return err
+	}
+
+	if err := orm.RegisterDataBase("default", "mysql", g_ConfigData.SqlConn); err != nil {
 		return err
 	}
 

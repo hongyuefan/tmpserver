@@ -2,6 +2,6 @@
 	"port":"8080",
 	"prof":"10006",
 	"logdir":"./",
-	"sqlconn":"root:30bb9f7ed8@tcp(39.105.5.188:3306)/cyyungoucms",
+	"sqlconn":"root:@tcp(127.0.0.1:3306)/gameant",
 	"idls":10
 }

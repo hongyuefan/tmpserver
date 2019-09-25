@@ -1,10 +1,12 @@
 package api
 
 import (
+	"container/list"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/hongyuefan/tmpserver/api/userspace"
 	"github.com/hongyuefan/tmpserver/util/log"
 )
 
@@ -13,6 +15,7 @@ type Handlers struct {
 	chanClose chan struct{}
 	handler   *Handler
 	gPool     *GPool
+	mapTask   map[string]*list.List
 }
 
 func NewHandlers() *Handlers {
@@ -20,9 +23,10 @@ func NewHandlers() *Handlers {
 		upGrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool { return true },
 		},
-		gPool:     NewGPool(1, 1),
+		gPool:     NewGPool(100000, 100),
 		handler:   NewHandler(),
 		chanClose: make(chan struct{}),
+		mapTask:   make(map[string]*list.List, 0),
 	}
 }
 
@@ -63,4 +67,17 @@ func (h *Handlers) handlerMessage(ws *websocket.Conn) error {
 	rsp := h.handler.HandleMessage(msg)
 	h.gPool.SendMsg(typ, rsp, ws)
 	return nil
+}
+
+func (h *Handlers) registHandler() {
+	h.handler.RegistHandler(TYPE_PING_PONG, h.pong)
+	h.handler.RegistHandler(TYPE_USER_LOGIN, userspace.UserLogin)
+
+	h.handler.RegistHandler(TYPE_USER_SEARCH_SCENE, userspace.GetUserSearchScene)
+	h.handler.RegistHandler(TYPE_USER_DEFEN_SCENE, userspace.GetUserDefenScene)
+	h.handler.RegistHandler(TYPE_USER_QUEEN_SCENE, userspace.GetUserQueenScene)
+
+	h.handler.RegistHandler(TYPE_USER_SEARCH_UPDATE, userspace.UpdateUserSearchAnt)
+	h.handler.RegistHandler(TYPE_USER_DEFEN_UPDATE, userspace.UpdateUserDefenAnt)
+	h.handler.RegistHandler(TYPE_USER_QUEEN_UPDATE, userspace.UpdateUserQueenAnt)
 }

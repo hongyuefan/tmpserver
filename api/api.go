@@ -37,6 +37,10 @@ func (h *Handlers) OnClose() {
 }
 
 func (h *Handlers) HandlerGet(c *gin.Context) {
+	c.JSON(200, "success")
+}
+
+func (h *Handlers) HandlerWebsocketGet(c *gin.Context) {
 	ws, err := h.upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		return

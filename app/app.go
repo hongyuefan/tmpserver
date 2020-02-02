@@ -56,14 +56,14 @@ func (app *App) OnStart(c *config.Config) error {
 
 	router := gin.Default()
 
-	v0 := router.Group("/v0")
+	ws := router.Group("/ws/v1")
 	{
-		v0.GET("/health", app.handlers.HandlerGet)
+		ws.GET("/get", app.handlers.HandlerWebsocketGet)
 	}
 
-	v1 := router.Group("/v1")
+	ht := router.Group("/ht/v1")
 	{
-		v1.GET("/ws/server", app.handlers.HandlerGet)
+		ht.GET("/get", app.handlers.HandlerGet)
 	}
 
 	fmt.Println("Listen:", g_ConfigData.Port)
